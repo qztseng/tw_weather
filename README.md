@@ -1,2 +1,3 @@
-# tw_weather
-Data viz of historical weather data 
+# Just for fun....
+Scraping historical daily oberservation weather data from 500+ weather stations in Taiwan.
+Geospatial and temporal analysis/visualizaiton
