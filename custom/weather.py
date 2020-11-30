@@ -117,8 +117,8 @@ def direction_binning(dirs, bin_degree=45):
     
     return c.replace(N, 0).cat.remove_unused_categories() 
 
-# plot wind direciton
 
+# plot wind direciton
 def plot_wind(directions:pd.Series, bin_degree=45, ax=None):
 
     if ax is None:
