@@ -55,9 +55,9 @@ L.Control.SliderControl = L.Control.extend({
         $(document).mouseup(function () {
             map.dragging.enable();
             //Hide the slider timestamp if not range and option alwaysShowDate is set on false
-            if (options.range || !options.alwaysShowDate) {
-                $('#slider-timestamp').html('');
-            }
+            // if (options.range || !options.alwaysShowDate) {
+            //     $('#slider-timestamp').html('');
+            // }
         });
 
         this.easybar = this._createEasyBar(map);
@@ -77,6 +77,13 @@ L.Control.SliderControl = L.Control.extend({
         } else {
             console.log("Error: You have to specify a layerGroups via new SliderControl({layer: your_layer});");
         }
+
+        //move slider to current month on startup
+        // hs=$('#leaflet-slider').slider();
+        // sv=10
+        // hs.slider('option', 'value',sv);
+        // hs.slider('option','slide').call(hs,null,{ handle: $('.ui-slider-handle', hs), value: sv });
+
         return sliderContainer;
     },
 
@@ -89,9 +96,7 @@ L.Control.SliderControl = L.Control.extend({
         fwdB = L.easyButton('fa-forward', function(){stepForward()}, title='fwd', id=3);
 
         var easyBar = L.easyBar([bwdB, stopB, playB, fwdB]);
-        // console.log(easyBar.options);
         easyBar.options.position = 'bottomleft';
-        // console.log(easyBar.options);
         easyBar.addTo(map);
 
         var play = false
@@ -164,7 +169,7 @@ L.Control.SliderControl = L.Control.extend({
 
     startSlider: function () {
         _options = this.options;
-        _extractTimestamp = this.extractTimestamp;
+        _extractTimeStamp = this.extractTimestamp;
         var index_start = _options.minValue;
         if(_options.showAllOnStart){
             index_start = _options.maxValue;
@@ -191,7 +196,7 @@ L.Control.SliderControl = L.Control.extend({
                         // console.log(_options.layers[ui.value])
                         // if(_options.markers[ui.value].feature.properties[_options.timeAttribute]){
                         //     if(_options.markers[ui.value]) $('#slider-timestamp').html(
-                        //         _extractTimestamp(_options.markers[ui.value].feature.properties[_options.timeAttribute], _options));
+                        //         _extractTimeStamp(_options.markers[ui.value].feature.properties[_options.timeAttribute], _options));
                         // }else {
                         //     console.error("Time property "+ _options.timeAttribute +" not found in data");
                         // }
@@ -199,7 +204,7 @@ L.Control.SliderControl = L.Control.extend({
                         // set by leaflet Vector Layers
                         if(_options.layers[ui.value].options[_options.timeAttribute]){
                             if(_options.layers[ui.value]) $('#slider-timestamp').html(
-                                _extractTimestamp(_options.layers[ui.value].options[_options.timeAttribute], _options));
+                                _extractTimeStamp(_options.layers[ui.value].options[_options.timeAttribute], _options));
                         }else {
                             console.error("Time property "+ _options.timeAttribute +" not found in data");
                         }
@@ -234,12 +239,18 @@ L.Control.SliderControl = L.Control.extend({
             }
         });
         if (!_options.range && _options.alwaysShowDate) {
-            $('#slider-timestamp').html(_extractTimeStamp(_options.layers[index_start].feature.properties[_options.timeAttribute], _options));
+            // $('#slider-timestamp').html(_extractTimeStamp(_options.layers[index_start].feature.properties[_options.timeAttribute], _options));
         }
         for (i = _options.minValue; i <= index_start; i++) {
             // _options.map.addLayer(_options.layers[i]);
             _options.layers[i].addTo(_options.map);
         }
+
+        // move slider to current month on startup
+        d = new Date();
+        sv = d.getMonth();
+        $("#leaflet-slider").slider('option', 'value',sv);
+        $('#slider-timestamp').html(_extractTimeStamp(_options.layers[sv].options[_options.timeAttribute], _options));
     }
 });
 

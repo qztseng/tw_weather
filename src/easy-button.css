@@ -59,13 +59,13 @@
 
 .leaflet-bar.easy-button-container.leaflet-control{
   position: relative;
-  bottom: 30px;
+  bottom: 50px;
 }
 
 #leaflet-slider.ui-slider{
-  position: fixed;
+  position: relative;
   text-align: left;
-  bottom: 30px;
+  bottom: -20px;
 }
 
 .leaflet-bar.easy-button-container.leaflet-control button{

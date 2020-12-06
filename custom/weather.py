@@ -211,6 +211,62 @@ def plot_wind_gust(directions:pd.Series, directionsG:pd.Series, G_dir, G_speed, 
     return radi_max
 
 
+def plot_wind_color(df_temp, col_bin, col_ws, ws_max=None, G_dir=None, G_speed=None, cmap='jet', ax=None):
+    '''rose plot for wind direciton.
+    Polar histogram height(size) stands for occurance(count) in that direction.
+    Color of the bar stands for median wind speed in that direction.
+    '''
+
+    radii = df_temp[col_bin].value_counts(sort=False)
+    ws = df_temp.groupby([col_bin])[col_ws].median().fillna(0)
+    # create cmap
+    cmap = matplotlib.cm.get_cmap(cmap)
+    #scale ws to [0,1], use either given global max, or local max
+    if ws_max is None:
+        ws_max = ws.max()
+    ws_scaled = (ws-ws.min())/(ws_max-ws.min())
+    
+    #get corresponding colors
+    colors = [cmap(w) for w in ws_scaled]
+    #bar width
+    width = (2*np.pi) / 36
+    #polar coord of the bar (starting angles in radian)
+    theta = np.linspace(0.0, 2 * np.pi, 36, endpoint=True)
+    radi_max = radii.max()
+    
+    if ax is None:
+        ax = plt.subplot(111,polar=True)
+
+    bars = ax.bar(theta, radii, width=width, bottom=0, align='edge',
+                  edgecolor = 'gray', linewidth=0, color=colors)
+    
+    if (G_dir is not None) & (G_speed is not None):
+        ax.quiver(0,0,np.radians(G_dir),radi_max, color='r', angles="xy", 
+              units="y", scale=1, scale_units='xy',headwidth=5,
+              zorder=10)
+        ax.text(1.0, 1.0, f'max gust:\n{G_speed}m/s',
+            ha='right', va='top',color='r', fontsize=12,
+            transform=ax.transAxes)
+    
+    # set starting from 12o'clock and clockwise
+    ax.set_theta_zero_location("N")
+    ax.set_theta_direction(-1)
+    # hide grid, spine and yticks
+    ax.grid(alpha=0.3)
+    ax.spines['polar'].set_visible(False)
+    ax.set_yticks([])
+    # set the angle label
+    xticks = ax.get_xticks()
+    ax.set_xticks(xticks)
+#     ax.set_xticks([0,np.pi/2,np.pi,np.pi*3/2])
+#     ax.set_xticklabels(['N','', 'E','', 'S','', 'W',''])
+    ax.set_xticklabels(['','', '','', '','', '',''])
+
+
+#     plt.show()
+    return bars
+
+
 def map_with_marker(lat: pd.Series,
                     lng: pd.Series,
                     label1: pd.Series,
