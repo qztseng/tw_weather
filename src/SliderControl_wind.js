@@ -112,7 +112,7 @@ L.Control.SliderControl = L.Control.extend({
             play = true;
             while (play) {
                 stepForward();
-                await timer(500); 
+                await timer(750); 
             }
         }
 
@@ -253,6 +253,23 @@ L.Control.SliderControl = L.Control.extend({
         $('#slider-timestamp').html(_extractTimeStamp(_options.layers[sv].options[_options.timeAttribute], _options));
     }
 });
+
+L.Control.Watermark = L.Control.extend({
+    onAdd: function(map) {
+        var img = L.DomUtil.create('img');
+        img.src = 'colorbar.png';
+        // img.style.width = '200px';
+        return img;
+    },
+
+    onRemove: function(map) {
+        // Nothing to do here
+    }
+});
+
+L.control.watermark = function(opts) {
+    return new L.Control.Watermark(opts);
+};
 
 
 L.control.sliderControl = function (options) {
