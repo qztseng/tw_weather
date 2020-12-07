@@ -255,9 +255,14 @@ L.Control.SliderControl = L.Control.extend({
 });
 
 L.Control.Watermark = L.Control.extend({
+    options: {
+        position: 'topright',
+        imgSrc: null
+    },
+
     onAdd: function(map) {
         var img = L.DomUtil.create('img');
-        img.src = 'colorbar.png';
+        img.src = this.options.imgSrc;
         // img.style.width = '200px';
         return img;
     },
@@ -267,8 +272,8 @@ L.Control.Watermark = L.Control.extend({
     }
 });
 
-L.control.watermark = function(opts) {
-    return new L.Control.Watermark(opts);
+L.control.watermark = function(options) {
+    return new L.Control.Watermark(options);
 };
 
 
