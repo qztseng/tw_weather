@@ -1,0 +1,81 @@
+.leaflet-bar button,
+.leaflet-bar button:hover {
+  background-color: #fff;
+  border: none;
+  /*border-bottom: 1px solid #ccc;*/
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  display: inline;
+  text-align: center;
+  text-decoration: none;
+  color: black;
+}
+
+.leaflet-bar button {
+  background-position: 50% 50%;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.leaflet-bar button:hover {
+  background-color: #f4f4f4;
+}
+
+.leaflet-bar button:first-of-type {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.leaflet-bar button:last-of-type {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  border-right: none;
+}
+
+.leaflet-bar.disabled,
+.leaflet-bar button.disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: .4;
+}
+
+.easy-button-button .button-state{
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.leaflet-touch .leaflet-bar button {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+}
+
+.leaflet-bottom .leaflet-control {
+    margin-bottom: 20px;
+}
+
+.leaflet-bar.easy-button-container.leaflet-control{
+  position: relative;
+  bottom: 50px;
+}
+
+#leaflet-slider.ui-slider{
+  position: relative;
+  text-align: left;
+  bottom: -20px;
+}
+
+.leaflet-bar.easy-button-container.leaflet-control button{
+    font-size: 16px;
+}
+
+img.leaflet-control{
+  opacity: 80%;
+  position: relative;
+  top: 10px;
+  right: -40px;
+}
+
