@@ -171,14 +171,17 @@ L.Control.SliderControl = L.Control.extend({
         _options = this.options;
         _extractTimeStamp = this.extractTimestamp;
         var index_start = _options.minValue;
-        if(_options.showAllOnStart){
-            index_start = _options.maxValue;
-            if(_options.range) _options.values = [_options.minValue,_options.maxValue];
-            else _options.value = _options.maxValue;
-        } else {
-            for (i in _options.layers){
-                _options.layers[i].remove();
-            }
+        // if(_options.showAllOnStart){
+        //     index_start = _options.maxValue;
+        //     if(_options.range) _options.values = [_options.minValue,_options.maxValue];
+        //     else _options.value = _options.maxValue;
+        // } else {
+        //     for (i in _options.layers){
+        //         _options.layers[i].remove();
+        //     }
+        // }
+        for (i in _options.layers){
+            _options.layers[i].remove();
         }
         $("#leaflet-slider").slider({
             range: _options.range,
