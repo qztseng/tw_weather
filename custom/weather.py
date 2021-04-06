@@ -16,16 +16,36 @@ import geocoder
 matplotlib.rcParams['font.family'] = ['Heiti TC']
 
 
-def get_Monthly_Weather(station:str, yearmonth:str) -> pd.DataFrame:
-    url = 'https://e-service.cwb.gov.tw/HistoryDataQuery/MonthDataController.do'
-
+def get_Monthly_Weather(station:str, yearmonth:str, session=None) -> pd.DataFrame:
+    '''
+    get daily weather report of specified station for a given month 
+    
+    Arguments:
+    ----------
+    station: 6-character alphanumerical code, 
+        can be found at https://e-service.cwb.gov.tw/wdps/obs/state.htm
+    yearmonth: date string in the format 'yyyy-mm'
+    session: a request.Session to speed up consecutive requests
+    
+    Returns:
+    --------
+    a parsed pandas dataframe
+    '''
+    
+    url = 'http://e-service.cwb.gov.tw/HistoryDataQuery/MonthDataController.do'
+    
+    if session is None:
+        session = requests.Session()
+    
     try:
-        r = requests.post(url, {
-        'command':'viewMain',
-        'station':station,    
-        'stname':'',
-        'datepicker':yearmonth
-        } ,verify=False)
+        r = session.get(url, **{'params':
+                                {'command':'viewMain',
+                                 'station':station,
+                                 'stname':"",
+                                 'datepicker':yearmonth
+                                },
+                                'verify':False,
+                               })
         r.encoding = 'utf8'
 
         dfs = pd.read_html(r.text, header=0)[1]
@@ -39,18 +59,49 @@ def get_Monthly_Weather(station:str, yearmonth:str) -> pd.DataFrame:
     
     return dfs.drop(columns=dfs.columns[0]).set_index(keys='date')
 
-def get_Yearly_Weather(station:str, year:str, month_end=12, verbose=True) -> pd.DataFrame:
-
+def get_Yearly_Weather(station:str, year:str, month_end=12, verbose=True, session=None) -> pd.DataFrame:
+    '''
+    Concatenate daily weather data from the get_Monthly_Weather function
+    
+    Arguments:
+    ----------
+    station: 6-character alphanumerical code, 
+        can be found at https://e-service.cwb.gov.tw/wdps/obs/state.htm
+    year: date string in the format 'yyyy'
+    session: a request.Session to speed up consecutive requests
+    
+    Returns:
+    --------
+    a parsed pandas dataframe
+    '''
+    if session is None:
+        session = requests.Session()
+    
     df = pd.DataFrame()
     for m in range(1,month_end+1):
         ym = (year+f'-{m:02}')
         if(verbose):print(ym)
-        temp = get_Monthly_Weather(station, ym)
+        temp = get_Monthly_Weather(station, ym, session)
         df = df.append(temp)
     
     return df
 
 def get_historical_weather(station:str, y_start:int=2010, y_end:int=date.today().year, verbose=True) ->pd.DataFrame:
+    '''
+    Concatenate daily weather data from the get_Yearly_Weather function
+    
+    Arguments:
+    ----------
+    station: 6-character alphanumerical code, 
+        can be found at https://e-service.cwb.gov.tw/wdps/obs/state.htm
+    y_start: query starting year, in the format yyyy (int)
+    y_end: query ending year, in the format yyyy (int)
+    
+    Returns:
+    --------
+    a parsed pandas dataframe
+    '''
+    session = requests.Session()
 
     #st = '466920'  #台北466920  宜蘭467080
     his = pd.DataFrame()
@@ -61,7 +112,7 @@ def get_historical_weather(station:str, y_start:int=2010, y_end:int=date.today()
         m_end=12
         if(y == today.year):
             m_end = today.month
-        temp = get_Yearly_Weather(station, yy, m_end, verbose)
+        temp = get_Yearly_Weather(station, yy, m_end, verbose, session)
         his = his.append(temp)
 
     return his
@@ -280,8 +331,11 @@ def map_with_marker(lat: pd.Series,
                     **kwarg):
     
     # create a color map
-    cmap = cm.get_cmap(cmap, color.nunique())    # PiYG
-    rgb = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(cmap.N)]
+    if isinstance(cmap, str):
+        cmap = cm.get_cmap(cmap, color.nunique())
+        rgb = [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(cmap.N)]
+    else:
+        rgb=cmap
 
     # create the location map
     g = geocoder.osm(location)
@@ -290,6 +344,8 @@ def map_with_marker(lat: pd.Series,
     
     f = folium.Figure(width=width, height=height)
     map_ = folium.Map(location=[latitude, longitude], zoom_start=zoom).add_to(f)
+    folium.raster_layers.TileLayer(tiles='stamenterrain', name='地型圖').add_to(map_)
+    folium.LayerControl(collapsed=True, position='topleft').add_to(map_)
 
     # add marker to map
     for lat, lng, l1, l2, c in zip(lat, lng, label1, label2, color):
@@ -299,6 +355,7 @@ def map_with_marker(lat: pd.Series,
             [lat, lng],
             radius=5,
             popup=label,
+            tooltip=text,
             color=rgb[c],
             fill=True,
             fill_color=rgb[c],
